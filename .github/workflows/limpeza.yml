@@ -1,0 +1,32 @@
+name: limpeza
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 7 * * *'
+permissions:
+  contents: write
+jobs:
+  limpar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apagar releases com mais de 2 dias
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          LIMITE=$(date -u -d '2 days ago' +%s)
+          gh api "repos/$GITHUB_REPOSITORY/releases?per_page=100" --jq '.[] | [.tag_name, .created_at] | @tsv' | while IFS=$'\t' read -r tag criado; do
+            t=$(date -u -d "$criado" +%s)
+            if [ "$t" -lt "$LIMITE" ]; then gh release delete "$tag" --yes --cleanup-tag --repo "$GITHUB_REPOSITORY"; fi
+          done
+      - name: Apagar imagens com mais de 2 dias
+        run: |
+          git config user.name "limpeza"; git config user.email "limpeza@users.noreply.github.com"
+          mudou=0
+          for f in imagens/*; do
+            [ -f "$f" ] || continue
+            [ "$(basename "$f")" = ".gitkeep" ] && continue
+            ts=$(git log -1 --format=%ct -- "$f")
+            if [ -n "$ts" ] && [ "$ts" -lt "$(date -u -d '2 days ago' +%s)" ]; then git rm -q "$f"; mudou=1; fi
+          done
+          if [ "$mudou" = 1 ]; then git commit -qm "Limpeza automatica de imagens antigas" && git push; fi
