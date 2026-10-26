@@ -6,4 +6,4 @@ O Instagram so aceita buscar imagem/video em um endereco publico; este repositor
 - Entra aqui SOMENTE midia aprovada pelo Verificador e pronta para postar (que seria publica de qualquer jeito).
 - Nunca teste, rascunho ou reprovado.
 - Imagens: pasta `imagens/`. Videos: arquivos de release.
-- Depois de publicar, o proprio fluxo apaga o arquivo; alem disso, a limpeza automatica (`limpeza.yml`) remove o que tiver mais de 2 dias.
+- Depois de publicar, o proprio fluxo apaga o arquivo; alem disso, a limpeza automatica (`limpeza.yml`) remove o que tiver mais de 12 horas.
